@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -12,4 +6,69 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER     // Cliente padrão que agenda os serviços
+  PROVIDER // O profissional que presta o serviço (barbeiro, médico, etc)
+  ADMIN    // Administrador do sistema
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relações ---
+  // Se este usuário for um PROVIDER, ele pode ter vários Serviços cadastrados.
+  services  Service[]
+
+  // Um usuário pode ter vários agendamentos no papel de CLIENTE.
+  appointmentsAsClient   Appointment[] @relation("ClientAppointments")
+  // Um usuário pode ter vários agendamentos no papel de PROVIDER.
+  appointmentsAsProvider Appointment[] @relation("ProviderAppointments")
+}
+
+model Service {
+  id                Int     @id @default(autoincrement())
+  name              String  // Ex: "Corte de Cabelo Masculino"
+  price             Decimal // Usar Decimal para dinheiro é mais preciso que Float
+  durationInMinutes Int     // Ex: 45 (minutos)
+
+  // --- Relação ---
+  // Cada serviço pertence a um e somente um prestador (User).
+  providerId        Int
+  provider          User    @relation(fields: [providerId], references: [id])
+
+  // Um mesmo tipo de serviço pode estar em vários agendamentos.
+  appointments      Appointment[]
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  date        DateTime // Armazena a data e a HORA de início do agendamento
+
+  // --- Relação com o Cliente ---
+  clientId    Int
+  client      User     @relation("ClientAppointments", fields: [clientId], references: [id])
+
+  // --- Relação com o Prestador ---
+  providerId  Int
+  provider    User     @relation("ProviderAppointments", fields: [providerId], references: [id])
+  
+  // --- Relação com o Serviço ---
+  serviceId   Int
+  service     Service  @relation(fields: [serviceId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Regra de negócio no banco: Um prestador não pode ter dois
+  // agendamentos diferentes exatamente no mesmo horário de início.
+  @@unique([providerId, date])
 }
