@@ -1,3 +1,4 @@
+import { Role } from "../../generated/prisma";
 import { prisma } from "../lib/prisma";
 import { hash } from 'bcryptjs'
 
@@ -5,10 +6,11 @@ interface IReq {
     name: string
     email: string
     password: string
+    role?: Role
 }
 
 class CreateUserService {
-    public async execute({ name, email, password }: IReq) {
+    public async execute({ name, email, password, role }: IReq) {
         const userExists = await prisma.user.findUnique({
             where: {
                 email,
@@ -25,6 +27,7 @@ class CreateUserService {
                 name, 
                 email,
                 password: hashedPassword,
+                role,
             },
             select: {
                 id: true,
