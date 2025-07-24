@@ -15,7 +15,7 @@ interface IAvailability {
 
 
 class ListProviderAvailabilityService {
-    public async execute({providerId, year, month, day}: IRequest) {
+    public async execute({providerId, year, month, day}: IRequest): Promise <IAvailability[]> {
 
         // console.log('DADOS RECEBIDOS NO SERVIÇO:', { providerId, year, month, day });
 
@@ -29,8 +29,27 @@ class ListProviderAvailabilityService {
                     lt: new Date(year, month - 1, day, 23, 59 , 59)
                 }
             }
-        })
-        return appointmentsInDay;
+        });
+
+        const bookedHours = appointmentsInDay.map(appointment => getHours(appointment.date));
+
+        const workHours = Array.from({ length: 10 }, (_, index) => index + 8); 
+
+        const currentDate = new Date();
+
+        const availability = workHours.map(hour => {
+            const hasAppointmentInHour = bookedHours.includes(hour);
+            const compareDate = new Date(year, month - 1, day, hour);
+
+            const isAvailable = !hasAppointmentInHour && isAfter(compareDate, currentDate);
+
+            return {
+                hour,
+                available: isAvailable,
+            };
+        });
+
+        return availability;
     }
 }
 

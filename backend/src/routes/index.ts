@@ -4,6 +4,7 @@ import SessionController from "../controllers/SessionController";
 import { isAuthenticated } from "../middlewares/isAuthenticated";
 import ServiceController from "../controllers/ServiceController";
 import ProviderController from "../controllers/ProviderController";
+import AppointmentController from "../controllers/AppointmentController";
 
 
 const router = Router();
@@ -29,5 +30,7 @@ router.get('/providers', ProviderController.list)
 
 
 router.get('/providers/:providerId/availability', ProviderController.availability)
+
+router.post('/appointments', isAuthenticated, AppointmentController.create)
 
 export default router
