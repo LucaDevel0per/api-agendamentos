@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from 'zod';
 import CreateUserService from "../services/CreateUserService";
 import { Role } from "../../generated/prisma";
+import ShowProfileService from '../services/ShowProfileService'
 
 const strongPasswordRegex = new RegExp(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
@@ -24,6 +25,15 @@ class UserController {
         const user = await createUser.execute({ name, email, password, role })
 
         return res.status(201).json(user);
+    }
+
+    public async show(req: Request, res: Response): Promise<Response> {
+        const showProfile = new ShowProfileService();
+        const userId = req.user.id;
+
+        const user = await showProfile.execute({ userId })
+
+        return res.json(user)
     }
 }
 
