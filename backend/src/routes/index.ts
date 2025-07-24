@@ -3,6 +3,8 @@ import UserController from "../controllers/UserController";
 import SessionController from "../controllers/SessionController";
 import { isAuthenticated } from "../middlewares/isAuthenticated";
 import ServiceController from "../controllers/ServiceController";
+import ProviderController from "../controllers/ProviderController";
+
 
 const router = Router();
 
@@ -21,5 +23,8 @@ router.get('/me', isAuthenticated, UserController.show);
 
 // criar service
 router.post('/services', isAuthenticated, ServiceController.create)
+
+// get providers - user NÃO autenticados podem ver os profissionais disponiveis
+router.get('/providers', ProviderController.list)
 
 export default router

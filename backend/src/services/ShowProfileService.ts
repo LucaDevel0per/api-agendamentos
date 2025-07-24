@@ -24,4 +24,4 @@ class ShowProfileService {
     }
 }
 
-export default ShowProfileService;
+export default ShowProfileService
