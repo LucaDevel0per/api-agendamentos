@@ -27,4 +27,7 @@ router.post('/services', isAuthenticated, ServiceController.create)
 // get providers - user NÃO autenticados podem ver os profissionais disponiveis
 router.get('/providers', ProviderController.list)
 
+
+router.get('/providers/:providerId/availability', ProviderController.availability)
+
 export default router
