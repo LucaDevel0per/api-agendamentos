@@ -33,4 +33,6 @@ router.get('/providers/:providerId/availability', ProviderController.availabilit
 
 router.post('/appointments', isAuthenticated, AppointmentController.create)
 
+router.get('/appointments', isAuthenticated, AppointmentController.list)
+
 export default router

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import CreateAppointmentService from '../services/CreateAppointmentService';
+import ListUserAppointmentsService from '../services/ListUserAppointmentsService';
 
 const createAppointmentBodySchema = z.object({
     providerId: z.string(),
@@ -24,6 +25,20 @@ class AppointmentController {
         });
 
         return res.status(201).json(appointment);
+    }
+
+
+    public async list(req: Request, res: Response): Promise<Response> {
+        const clientId = req.user.id;
+        const listUserAppointments =  new ListUserAppointmentsService();
+
+        const appointments = await listUserAppointments.execute({
+            userId: clientId
+        })
+
+        return res.json(appointments)
+        
+
     }
 }
 
