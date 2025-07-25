@@ -35,4 +35,6 @@ router.post('/appointments', isAuthenticated, AppointmentController.create)
 
 router.get('/appointments', isAuthenticated, AppointmentController.list)
 
+router.delete('/appointments/:appointmentId', isAuthenticated, AppointmentController.delete);
+
 export default router

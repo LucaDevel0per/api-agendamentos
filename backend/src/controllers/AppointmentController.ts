@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import CreateAppointmentService from '../services/CreateAppointmentService';
 import ListUserAppointmentsService from '../services/ListUserAppointmentsService';
+import CancellAppointmentsService from '../services/CancelAppointmentService';
 
 const createAppointmentBodySchema = z.object({
     providerId: z.string(),
@@ -39,6 +40,20 @@ class AppointmentController {
         return res.json(appointments)
         
 
+    }
+
+    public async delete(req: Request, res: Response) {
+        const { id: userId} = req.user;
+        const {appointmentId} = req.params;
+
+        const cancelAppointment = new CancellAppointmentsService();
+
+        const cancel = await cancelAppointment.execute({
+            appointmentId: appointmentId,
+            userId: userId
+        })
+
+        return res.status(204).send()
     }
 }
 
