@@ -5,6 +5,7 @@ interface AuthContextData {
     user: User | null;
     token: string | null;
     signIn(credentials: SignInCredentials): Promise<void>;
+    signOut(): void;
 }
 
 interface User {
@@ -19,12 +20,22 @@ interface SignInCredentials {
     password: string;
 }
 
-// Cria o contexto
 const AuthContext = createContext({} as AuthContextData);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(() => {
+        const storagedUser = localStorage.getItem('@Agendamentos:user');
+        return storagedUser ? JSON.parse(storagedUser) : null;
+    });
+    const [token, setToken] = useState<string | null>(() => {
+        const storagedToken = localStorage.getItem('@Agendamentos:token');
+
+        if (storagedToken) {
+            api.defaults.headers.common['Authorization'] = `Bearer ${storagedToken}`;
+        }
+
+        return storagedToken;
+    });
 
     async function signIn({ email, password }: SignInCredentials) {
         try {
@@ -45,8 +56,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+    function signOut() {
+        setUser(null);
+        setToken(null);
+
+        localStorage.removeItem('@Agendamentos:token');
+    }
+
     return (
-        <AuthContext.Provider value={{ user, token, signIn }}>
+        <AuthContext.Provider value={{ user, token, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     )
