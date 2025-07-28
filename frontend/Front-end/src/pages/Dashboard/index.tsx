@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getProviders } from '../../services/api';
 
@@ -45,7 +46,9 @@ export function Dashboard() {
             <ul>
                 {providers.map(provider => (
                     <li key={provider.id}>
-                        {provider.name} ({provider.category || 'Sem Categoria'})
+                        <Link to={`/new-appointment/${provider.id}`}>
+                            {provider.name} ({provider.category || 'Sem Categoria'})
+                        </Link>
                     </li>
                 ))}
             </ul>

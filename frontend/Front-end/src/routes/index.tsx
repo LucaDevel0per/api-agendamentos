@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { CreateAppointment } from '../pages/CreateAppointment';
 
 
 
@@ -17,7 +18,7 @@ export function AppRoutes() {
 
                     <>
                         <Route path="/dashboard" element={<Dashboard />} />
-                        {}
+                        <Route path="/new-appointment/:providerId" element={<CreateAppointment />} />
                         <Route path="*" element={<Navigate to="/dashboard" />} />
                     </>
                 ) : (
@@ -25,7 +26,7 @@ export function AppRoutes() {
                     <>
                         <Route path="/" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        {}
+                        <Route path="/new-appointment/:providerId" element={<CreateAppointment />} />
                         <Route path="*" element={<Navigate to="/" />} />
                     </>
                 )}
