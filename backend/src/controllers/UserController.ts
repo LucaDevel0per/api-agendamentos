@@ -3,6 +3,7 @@ import { z } from 'zod';
 import CreateUserService from "../services/CreateUserService";
 import { Role } from "../../generated/prisma";
 import ShowProfileService from '../services/ShowProfileService'
+import { Category } from "@prisma/client";
 
 const strongPasswordRegex = new RegExp(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
@@ -14,15 +15,21 @@ const createUserBodySchema = z.object({
     password: z.string().regex(strongPasswordRegex, {
         message: "A senha precisa ter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial (@$!%*?&)."
     }), 
-    role: z.enum([Role.USER, Role.PROVIDER, Role.ADMIN]).optional()
+    role: z.enum([Role.USER, Role.PROVIDER, Role.ADMIN]).optional(),
+    category: z.enum([ // ADICIONE ESTE CAMPO
+        Category.BARBEIRO,
+        Category.CABELEIREIRO,
+        Category.MANICURE,
+        Category.TATUADOR,
+    ]).optional(),
 })
 
 class UserController {
     public async create(req: Request, res: Response): Promise<Response> {
 
-        const { name, email, password, role } = createUserBodySchema.parse(req.body);
+        const { name, email, password, role, category } = createUserBodySchema.parse(req.body);
         const createUser = new CreateUserService
-        const user = await createUser.execute({ name, email, password, role })
+        const user = await createUser.execute({ name, email, password, role, category })
 
         return res.status(201).json(user);
     }

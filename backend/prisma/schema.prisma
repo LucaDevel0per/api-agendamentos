@@ -13,12 +13,20 @@ enum Role {
   ADMIN    // Administrador do sistema
 }
 
+enum Category {
+  BARBEIRO
+  TATUADOR
+  MANICURE
+  CABELEIREIRO
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
   password  String
   role      Role     @default(USER)
+  category  Category?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
