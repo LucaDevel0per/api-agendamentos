@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from 'zod';
 import ListProvidersService from "../services/ListProvidersService";
 import ListProviderAvailabilityService from "../services/ListProviderAvailabilityService";
+import { Category } from "@prisma/client";
 
 const getAvailabilityQuerySchema = z.object({
     year: z.coerce.number().int(), // z.coerce tenta converter a string para número
@@ -9,12 +10,27 @@ const getAvailabilityQuerySchema = z.object({
     day: z.coerce.number().int(),
 });
 
+const listProvidersQuerySchema = z.object({
+    category: z.enum([
+        Category.BARBEIRO,
+        Category.CABELEIREIRO,
+        Category.MANICURE,
+        Category.TATUADOR
+    ]).optional()
+});
+
 class ProviderController {
     public async list(req: Request, res: Response): Promise<Response> {
+
+        const { category } = listProvidersQuerySchema.parse(req.query);
+
         const listProviders = new ListProvidersService();
-        const providers = await listProviders.execute()
-        return res.status(200).json(providers)
+        const providers = await listProviders.execute({ category })
+
+        return res.status(200).json(providers);
     }
+
+
 
     public async availability(req: Request, res: Response): Promise<Response> 
     {
